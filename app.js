@@ -12,8 +12,8 @@ const app = express();
 app.use(express.static(path.join(__dirname, 'public')));
 
 
-app.listen(PORT);
-
 app.use('/cards', cards);
 app.use('/users', users);
 app.use('/:incorrect', wrongPage);
+
+app.listen(PORT);

@@ -1,59 +1,60 @@
 class Card {
-    constructor(api) {
-        this.api = api;
-    }
-    create(linkValue, nameValue, idValue, likesValue) {
-          
-        const card = document.createElement('div');
-        card.classList.add('place-card');
-        card.id = idValue;
+  constructor(api) {
+    this.api = api;
+  }
 
-        const image = document.createElement('div');
-        image.classList.add('place-card__image');
-        image.setAttribute('style', 'background-image: url(' + linkValue + ')');
+  create(linkValue, nameValue, idValue, likesValue) {
+    const card = document.createElement('div');
+    card.classList.add('place-card');
+    card.id = idValue;
 
-        const deleteIcon = document.createElement('button');
-        deleteIcon.classList.add('place-card__delete-icon');
+    const image = document.createElement('div');
+    image.classList.add('place-card__image');
+    image.setAttribute('style', `background-image: url(${  linkValue  })`);
 
-        const description = document.createElement('div');
-        description.classList.add('place-card__description');
+    const deleteIcon = document.createElement('button');
+    deleteIcon.classList.add('place-card__delete-icon');
 
-        const name = document.createElement('h3');
-        name.classList.add('place-card__name');
-        name.textContent = nameValue;
+    const description = document.createElement('div');
+    description.classList.add('place-card__description');
 
-        const like = document.createElement('div');
-        like.classList.add('place-card__like');
+    const name = document.createElement('h3');
+    name.classList.add('place-card__name');
+    name.textContent = nameValue;
 
-        const likeIcon = document.createElement('button');
-        likeIcon.classList.add('place-card__like-icon');
+    const like = document.createElement('div');
+    like.classList.add('place-card__like');
 
-        const likeCounter = document.createElement('h4');
-        likeCounter.classList.add('place-card__like-counter');
-        likeCounter.textContent = likesValue;
+    const likeIcon = document.createElement('button');
+    likeIcon.classList.add('place-card__like-icon');
 
-        image.appendChild(deleteIcon);
-        description.appendChild(name);
-        description.appendChild(like);
-        like.appendChild(likeIcon);
-        like.appendChild(likeCounter);
-        card.appendChild(image);
-        card.appendChild(description);
+    const likeCounter = document.createElement('h4');
+    likeCounter.classList.add('place-card__like-counter');
+    likeCounter.textContent = likesValue;
 
-        likeIcon.addEventListener('click', this.like.bind(this));
-        deleteIcon.addEventListener('click', this.remove.bind(this));
-        return card;
-    }
-    like(event) {
-        event.target.classList.toggle('place-card__like-icon_liked');
-    }
+    image.appendChild(deleteIcon);
+    description.appendChild(name);
+    description.appendChild(like);
+    like.appendChild(likeIcon);
+    like.appendChild(likeCounter);
+    card.appendChild(image);
+    card.appendChild(description);
 
-    remove() {
-        //fetch()
-       // if (event.target.classList.contains('place-card__delete-icon')) {
-         //   this.updateData.removeCard(this.id);
-        //};
-        this.api.delete(event.target.closest('.place-card').id);
-        event.target.closest('.place-card').remove();
-    }
+    likeIcon.addEventListener('click', this.like.bind(this));
+    deleteIcon.addEventListener('click', this.remove.bind(this));
+    return card;
+  }
+
+  like(event) {
+    event.target.classList.toggle('place-card__like-icon_liked');
+  }
+
+  remove() {
+    // fetch()
+    // if (event.target.classList.contains('place-card__delete-icon')) {
+    //   this.updateData.removeCard(this.id);
+    // };
+    this.api.delete(event.target.closest('.place-card').id);
+    event.target.closest('.place-card').remove();
+  }
 }

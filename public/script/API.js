@@ -1,3 +1,4 @@
+/* eslint-disable class-methods-use-this */
 class API {
   constructor(authorization) {
     this.authorization = authorization;
@@ -5,27 +6,27 @@ class API {
 
   getInitialCards() {
     return fetch(`${authorization.url}/cards`, {
-      headers: { 
-        authorization: authorization.token
+      headers: {
+        authorization: authorization.token,
       },
     })
-      .then(res => res.json())
+      .then((res) => res.json())
       .catch((err) => {
         console.log(`Ошибка ${err}`);
       });
   }
 
-  updateUserInfoApi(username, userjob) {    //обновляет на сервере информацию о пользователе
+  updateUserInfoApi(username, userjob) { // обновляет на сервере информацию о пользователе
     return fetch(`${authorization.url}/users/me`, {
       method: 'PATCH',
       headers: {
         authorization: authorization.token,
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         name: username,
-        about: userjob
-      })
+        about: userjob,
+      }),
     })
       .catch((err) => {
         console.log(`Ошибка ${err}`);
@@ -33,13 +34,13 @@ class API {
   }
 
 
-  getUserInfoApi() { //берет информацию о пользователе с сервера
+  getUserInfoApi() { // берет информацию о пользователе с сервера
     return fetch(`${authorization.url}/users/me`, {
       headers: {
-        authorization: authorization.token
-      }
+        authorization: authorization.token,
+      },
     })
-    .then(res => res.json())
+      .then((res) => res.json());
   }
 
 
@@ -48,7 +49,7 @@ class API {
       method: 'DELETE',
       headers: {
         authorization: authorization.token,
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
     })
       .catch((err) => {
@@ -57,19 +58,18 @@ class API {
   }
 
 
-
   postCard(link, name) {
     return fetch(`${authorization.url}/cards`, {
       method: 'POST',
       headers: {
         authorization: authorization.token,
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        name: name,
-        link: link
-      })
-    })
+        name,
+        link,
+      }),
+    });
   }
 
   newAvatar(avatar) {
@@ -77,16 +77,14 @@ class API {
       method: 'PATCH',
       headers: {
         authorization: authorization.token,
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        avatar: avatar
-      })
+        avatar,
+      }),
     })
-    .catch((err) => {
-      console.log(`Ошибка ${err}`);
-    });
+      .catch((err) => {
+        console.log(`Ошибка ${err}`);
+      });
   }
-
-
 }

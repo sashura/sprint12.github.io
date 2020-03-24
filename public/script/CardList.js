@@ -9,17 +9,8 @@ class CardList {
     this.api.getInitialCards()
       .then((res) => {
         for (const elem of res) {
-          this.container.insertAdjacentElement('beforeend', this.card.create(elem.link, elem.name, elem._id, elem.likes.length));
-        }
-      })
+        this.container.insertAdjacentElement('beforeend', this.card.create(elem.link, elem.name, elem._id, elem.likes.length));
+       }
+    });
   }
-
-
-
- // addCard(link, name) {
-   // this.api.postCard(link, name)
-     // .then((data) => {
-       // this.container.insertAdjacentElement('beforeend', this.card.create(data.link, data.name, data._id))
-     // })
-  //}
 }
