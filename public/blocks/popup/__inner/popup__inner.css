@@ -1,0 +1,10 @@
+.popup__inner {
+    max-width: 80vw;
+    max-height: 80vh;
+    position: relative;
+}
+
+.popup__innerimage {
+    max-width: 80vw;
+    max-height: 80vh;
+}
