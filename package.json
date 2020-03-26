@@ -2,7 +2,7 @@
   "name": "sprint12.github.io",
   "version": "1.0.0",
   "description": "back-end yandex.praktikum studing work",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
     "start": "nodemon app.js",
     "dev": "nodemon app.js"
@@ -19,7 +19,8 @@
   },
   "homepage": "https://github.com/sashura/sprint12.github.io#readme",
   "dependencies": {
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "mkdirp": "^1.0.3"
   },
   "devDependencies": {
     "eslint": "^6.8.0",

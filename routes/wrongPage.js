@@ -1,7 +1,7 @@
 const router = require('express').Router();
 
-router.get('/', (req, res) => {
-  res.send(404, { message: 'Запрашиваемый ресурс не найден' });
+router.all('/', (req, res) => {
+  res.status(404).send(JSON.stringify({ message: 'Запрашиваемый ресурс не найден' }));
 });
 
 module.exports = router;
