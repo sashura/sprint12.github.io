@@ -19,8 +19,7 @@
   },
   "homepage": "https://github.com/sashura/sprint12.github.io#readme",
   "dependencies": {
-    "express": "^4.17.1",
-    "mkdirp": "^1.0.3"
+    "express": "^4.17.1"
   },
   "devDependencies": {
     "eslint": "^6.8.0",
