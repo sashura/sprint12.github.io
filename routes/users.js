@@ -16,7 +16,7 @@ router.get('/', (req, res) => {
 
 router.get('/:id', (req, res) => {
   const users = path.join(__dirname, '../data/users.json');
-  fsPromises.readFile(users, { encoding: 'utf8'})
+  fsPromises.readFile(users, { encoding: 'utf8' })
     .then((data) => {
       const userFind = JSON.parse(data).find((item) => item._id === req.params.id);
       if (!userFind) {
