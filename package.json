@@ -1,8 +1,8 @@
 {
   "name": "sprint12.github.io",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "back-end yandex.praktikum studing work",
+  "main": "app.js",
   "scripts": {
     "start": "nodemon app.js",
     "dev": "nodemon app.js"
@@ -12,7 +12,7 @@
     "url": "git+https://github.com/sashura/sprint12.github.io.git"
   },
   "keywords": [],
-  "author": "",
+  "author": "Alexandra Zakharova",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/sashura/sprint12.github.io/issues"
