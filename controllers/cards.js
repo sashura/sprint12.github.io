@@ -3,14 +3,19 @@ const Card = require('../models/card');
 const getCards = (req, res) => {
   Card.find({})
     .then((card) => res.send({ data: card }))
-    .catch((err) => res.status(500).send(err.message));
+    .catch((err) => res.status(500).send(({ message: err.message })));
 };
 
 const createCard = (req, res) => {
   const { name, link, owner = req.user._id } = req.body;
   Card.create({ name, link, owner })
     .then((card) => res.status(201).send({ data: card }))
-    .catch((err) => res.status(500).send(err.message));
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        res.status(400).send({ message: err.message });
+      }
+      res.status(500).send({ message: err.message });
+    });
 };
 
 const deleteCard = (req, res) => {
@@ -22,7 +27,7 @@ const deleteCard = (req, res) => {
       }
       res.status(200).send({ message: 'Карточка удалена' });
     })
-    .catch((err) => res.status(500).send(err.message));
+    .catch((err) => res.status(500).send(({ message: err.message })));
 };
 
 const likeCard = (req, res) => {
@@ -32,7 +37,7 @@ const likeCard = (req, res) => {
     { new: true },
   )
     .then((card) => res.send(card))
-    .catch((err) => res.status(500).send(err.message));
+    .catch((err) => res.status(500).send(({ message: err.message })));
 };
 
 const dislikeCard = (req, res) => {
@@ -42,7 +47,7 @@ const dislikeCard = (req, res) => {
     { new: true },
   )
     .then((card) => res.send(card))
-    .catch((err) => res.status(500).send(err.message));
+    .catch((err) => res.status(500).send(({ message: err.message })));
 };
 
 module.exports = {
