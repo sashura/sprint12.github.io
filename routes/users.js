@@ -1,12 +1,10 @@
 const router = require('express').Router();
-// const path = require('path');
-// const fs = require('fs');
-// const fsPromises = require('fs').promises;
+
 const {
   getUsers,
   getUserById,
   createUser,
-  newUserData,
+  updateUserData,
   updateAvatar,
 } = require('../controllers/users');
 
@@ -14,7 +12,7 @@ const {
 router.get('/', getUsers);
 router.get('/:userId', getUserById);
 router.post('/', createUser);
-router.patch('/me', newUserData);
+router.patch('/me', updateUserData);
 router.patch('/me/avatar', updateAvatar);
 
 
