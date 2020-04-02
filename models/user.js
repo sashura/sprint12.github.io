@@ -10,8 +10,8 @@ const userSchema = new mongoose.Schema({
   },
   about: {
     type: String,
-    minlength: 2,
-    maxlength: 30,
+    minlength: [2, 'Длина имени пользователя от 2 до 30 символов'],
+    maxlength: [30, 'Длина имени пользователя от 2 до 30 символов'],
     required: [true, 'Поле обязательно для заполнения'],
   },
   avatar: {
