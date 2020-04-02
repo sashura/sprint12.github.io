@@ -3,10 +3,7 @@ const path = require('path');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 
-const users = require('./routes/users');
-const cards = require('./routes/cards');
-const wrongPage = require('./routes/wrongPage');
-
+const router = require('./routes/index');
 
 const { PORT = 3000 } = process.env;
 
@@ -30,8 +27,6 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use('/cards', cards);
-app.use('/users', users);
-app.use('*', wrongPage);
+app.use('/', router);
 
 app.listen(PORT);
