@@ -16,7 +16,13 @@ const getUserById = (req, res) => {
       }
       res.status(200).send({ data });
     })
-    .catch((err) => res.status(500).send(({ message: err.message })));
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(404).json({ message: 'Используйте валидный id' });
+      } else {
+        res.status(500).send(({ message: err.message }));
+      }
+    });
 };
 
 
@@ -27,8 +33,9 @@ const createUser = (req, res) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(400).send({ message: err.message });
+      } else {
+        res.status(500).send({ message: err.message });
       }
-      res.status(500).send({ message: err.message });
     });
 };
 
@@ -45,8 +52,9 @@ const updateUserData = (req, res) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(400).send({ message: err.message });
+      } else {
+        res.status(500).send({ message: err.message });
       }
-      res.status(500).send({ message: err.message });
     });
 };
 
@@ -57,8 +65,9 @@ const updateAvatar = (req, res) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(400).send({ message: err.message });
+      } else {
+        res.status(500).send({ message: err.message });
       }
-      res.status(500).send({ message: err.message });
     });
 };
 

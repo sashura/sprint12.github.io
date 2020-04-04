@@ -13,8 +13,9 @@ const createCard = (req, res) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(400).send({ message: err.message });
+      } else {
+        res.status(500).send({ message: err.message });
       }
-      res.status(500).send({ message: err.message });
     });
 };
 
@@ -27,7 +28,13 @@ const deleteCard = (req, res) => {
       }
       res.status(200).send({ message: 'Карточка удалена' });
     })
-    .catch((err) => res.status(500).send(({ message: err.message })));
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(404).json({ message: 'Используйте валидный id' });
+      } else {
+        res.status(500).send(({ message: err.message }));
+      }
+    });
 };
 
 const likeCard = (req, res) => {
@@ -36,8 +43,20 @@ const likeCard = (req, res) => {
     { $addToSet: { likes: req.user._id } },
     { new: true },
   )
-    .then((card) => res.send(card))
-    .catch((err) => res.status(500).send(({ message: err.message })));
+    .then((card) => {
+      if (!card) {
+        res.status(404).json({ message: 'Карточка не найдена' });
+        return;
+      }
+      res.status(200).send({ data: card });
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(404).json({ message: 'Используйте валидный id' });
+      } else {
+        res.status(500).send(({ message: err.message }));
+      }
+    });
 };
 
 const dislikeCard = (req, res) => {
@@ -46,8 +65,20 @@ const dislikeCard = (req, res) => {
     { $pull: { likes: req.user._id } },
     { new: true },
   )
-    .then((card) => res.send(card))
-    .catch((err) => res.status(500).send(({ message: err.message })));
+    .then((card) => {
+      if (!card) {
+        res.status(404).send({ message: 'Карточка не найдена' });
+        return;
+      }
+      res.status(200).send({ data: card });
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(404).json({ message: 'Используйте валидный id' });
+      } else {
+        res.status(500).send(({ message: err.message }));
+      }
+    });
 };
 
 module.exports = {
