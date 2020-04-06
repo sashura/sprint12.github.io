@@ -1,31 +1,19 @@
 const router = require('express').Router();
-const path = require('path');
-const fs = require('fs');
-const fsPromises = require('fs').promises;
+
+const {
+  getUsers,
+  getUserById,
+  createUser,
+  updateUserData,
+  updateAvatar,
+} = require('../controllers/users');
 
 
-router.get('/', (req, res) => {
-  const file = path.join(__dirname, '../data/users.json');
-  const readFile = fs.createReadStream(file, { encoding: 'utf8' });
-  res.writeHead(200, {
-    'Content-Type': 'application/json',
-  });
-  readFile.pipe(res);
-});
+router.get('/', getUsers);
+router.get('/:userId', getUserById);
+router.post('/', createUser);
+router.patch('/me', updateUserData);
+router.patch('/me/avatar', updateAvatar);
 
-
-router.get('/:id', (req, res) => {
-  const users = path.join(__dirname, '../data/users.json');
-  fsPromises.readFile(users, { encoding: 'utf8' })
-    .then((data) => {
-    // eslint-disable-next-line no-underscore-dangle
-      const userFind = JSON.parse(data).find((item) => item._id === req.params.id);
-      if (!userFind) {
-        res.status(404).send({ message: 'Нет пользователя с таким id' });
-        return;
-      }
-      res.send(userFind);
-    });
-});
 
 module.exports = router;
