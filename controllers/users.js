@@ -18,7 +18,7 @@ const getUserById = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(404).json({ message: 'Используйте валидный id' });
+        res.status(400).json({ message: 'Используйте валидный id' });
       } else {
         res.status(500).send(({ message: err.message }));
       }
