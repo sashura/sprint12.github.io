@@ -1,5 +1,7 @@
 const express = require('express');
-const path = require('path');
+require('dotenv').config();
+const helmet = require('helmet');
+
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
@@ -12,6 +14,7 @@ const { PORT = 3000 } = process.env;
 
 const app = express();
 
+app.use(helmet());
 app.use(cookieParser());
 
 mongoose.connect('mongodb://localhost:27017/mestodb', {
@@ -22,8 +25,6 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
 });
 
 app.use(bodyParser.json());
-
-app.use(express.static(path.join(__dirname, 'public')));
 
 app.post('/signin', login);
 app.post('/signup', createUser);
