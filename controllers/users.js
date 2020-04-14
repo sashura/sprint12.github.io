@@ -1,5 +1,32 @@
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+
+const { NODE_ENV, JWT_SECRET } = process.env;
 const User = require('../models/user');
 
+const login = (req, res) => {
+  const { email, password } = req.body;
+
+  return User.findUserByCredentials(email, password)
+    .then((user) => {
+      const token = jwt.sign(
+        { _id: user._id },
+        NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
+        { expiresIn: '7d' },
+      );
+      res.cookie('jwt', token, {
+        maxAge: 3600000 * 24 * 7,
+        httpOnly: true,
+        samSite: 'lax',
+      });
+    })
+    .then(() => res.status(200).send({ message: 'Авторизация прошла успешно ' }))
+    .catch(() => {
+      res
+        .status(401)
+        .send({ message: 'Неверный логин или пароль' });
+    });
+};
 
 const getUsers = (req, res) => {
   User.find({})
@@ -27,9 +54,22 @@ const getUserById = (req, res) => {
 
 
 const createUser = (req, res) => {
-  const { name, about, avatar } = req.body;
-  User.create({ name, about, avatar })
-    .then((user) => res.status(201).send({ data: user }))
+  const {
+    name, about, avatar, email,
+  } = req.body;
+  if (req.body.password === undefined) {
+    res.status(400).send({ message: 'Пароль для регистрации не введен' });
+  }
+  bcrypt.hash(req.body.password, 10)
+    .then((hash) => User.create({
+      name, about, avatar, email, password: hash,
+    }))
+    .then((user) => res.status(201).send({
+      name: user.name,
+      about: user.about,
+      email: user.email,
+      avatar: user.avatar,
+    }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(400).send({ message: err.message });
@@ -42,12 +82,15 @@ const createUser = (req, res) => {
 const updateUserData = (req, res) => {
   const { name, about } = req.body;
   User.findByIdAndUpdate(req.user._id, { name, about }, { runValidators: true })
-    .then((data) => {
+    .then((user) => {
       if
-      (data === null) {
+      (user === null) {
         res.status(404).json({ message: 'Пользователь не найден' });
       }
-      res.status(200).send({ data });
+      if (!user._id.equals(req.user._id)) {
+        res.status(403).json({ message: 'Нет прав для изменения данных пользователя' });
+      }
+      res.status(200).send({ user });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -61,7 +104,12 @@ const updateUserData = (req, res) => {
 const updateAvatar = (req, res) => {
   const { avatar } = req.body;
   User.findByIdAndUpdate(req.user._id, { avatar }, { runValidators: true })
-    .then((user) => res.send(user))
+    .then((data) => {
+      if (data._id !== req.user._id) {
+        res.status(403).json({ message: 'Нет прав для изменения данных пользователя' });
+      }
+      res.send(data);
+    })
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(400).send({ message: err.message });
@@ -77,4 +125,5 @@ module.exports = {
   createUser,
   getUserById,
   getUsers,
+  login,
 };

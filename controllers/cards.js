@@ -20,13 +20,19 @@ const createCard = (req, res) => {
 };
 
 const deleteCard = (req, res) => {
-  Card.findByIdAndRemove(req.params.cardId)
+  Card.findById(req.params.cardId)
     .then((data) => {
       if
       (data === null) {
         res.status(404).json({ message: 'Карточка не найдена' });
+        return;
       }
-      res.status(200).send({ message: 'Карточка удалена' });
+      if (!data.owner.equals(req.user._id)) {
+        res.status(403).json({ message: 'Нет прав для удаления' });
+      } else {
+        Card.findByIdAndDelete(req.params.cardId)
+          .then(() => res.status(200).send({ message: 'Карточка удалена' }));
+      }
     })
     .catch((err) => {
       if (err.name === 'CastError') {
