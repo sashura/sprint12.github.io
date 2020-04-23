@@ -20,7 +20,7 @@ const login = (req, res) => {
       res.cookie('jwt', token, {
         maxAge: 3600000 * 24 * 7,
         httpOnly: true,
-        samSite: 'lax',
+        sameSite: 'lax',
       });
     })
     .then(() => res.status(200).send({ message: 'Авторизация прошла успешно ' }))
@@ -54,25 +54,34 @@ const createUser = (req, res, next) => {
   const {
     name, about, avatar, email,
   } = req.body;
-  if (req.body.password === undefined) {
-    res.status(400).send({ message: 'Пароль для регистрации не введен' });
-  }
-  bcrypt.hash(req.body.password, 10)
-    .then((hash) => User.create({
-      name, about, avatar, email, password: hash,
-    }))
-    .then((user) => res.status(201).send({
-      name: user.name,
-      about: user.about,
-      email: user.email,
-      avatar: user.avatar,
-    }))
+  User.find({ email })
+    .then((data) => {
+      if (data.length !== 0) {
+        return res.status(400).send({ message: 'Email уже зарегистрирован' });
+      }
+      if (req.body.password === undefined) {
+        res.status(400).send({ message: 'Пароль для регистрации не введен' });
+      }
+      return bcrypt.hash(req.body.password, 10)
+        .then((hash) => User.create({
+          name, about, avatar, email, password: hash,
+        }))
+        .then((user) => res.status(201).send({
+          name: user.name,
+          about: user.about,
+          email: user.email,
+          avatar: user.avatar,
+        }));
+    })
     .catch(next);
 };
 
 const updateUserData = (req, res, next) => {
   const { name, about } = req.body;
-  User.findByIdAndUpdate(req.user._id, { name, about }, { runValidators: true })
+  User.findByIdAndUpdate(req.user._id, { name, about }, {
+    new: true,
+    runValidators: true,
+  })
     .then((user) => {
       if
       (user === null) {
@@ -81,14 +90,17 @@ const updateUserData = (req, res, next) => {
       if (!user._id.equals(req.user._id)) {
         throw new Forbidden('Нет прав для изменения данных пользователя');
       }
-      res.status(200).send({ user });
+      res.status(200).send(user);
     })
     .catch(next);
 };
 
 const updateAvatar = (req, res, next) => {
   const { avatar } = req.body;
-  User.findByIdAndUpdate(req.user._id, { avatar }, { runValidators: true })
+  User.findByIdAndUpdate(req.user._id, { avatar }, {
+    new: true,
+    runValidators: true,
+  })
     .then((data) => {
       if (data._id !== req.user._id) {
         throw new Forbidden('Нет прав для изменения данных пользователя');
