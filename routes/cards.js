@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const { celebrate, Joi } = require('celebrate');
+const validator = require('validator');
 
 const auth = require('../middlewares/auth');
 
@@ -18,7 +19,14 @@ router.get('/', auth, getCards);
 router.post('/', celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30),
-    link: Joi.string().required().uri(),
+    link: Joi.string()
+      .required()
+      .custom((value, err) => {
+        if (validator.isURL(value)) {
+          return value;
+        }
+        return err.message('Введите корректную ссылку в поле link');
+      }),
   }),
 }), auth, createCard);
 

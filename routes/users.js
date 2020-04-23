@@ -1,6 +1,7 @@
 const router = require('express').Router();
 
 const { celebrate, Joi } = require('celebrate');
+const validator = require('validator');
 
 const auth = require('../middlewares/auth');
 
@@ -30,7 +31,14 @@ router.patch('/me', celebrate({
 
 router.patch('/me/avatar', celebrate({
   body: Joi.object().keys({
-    avatar: Joi.string().required().uri(),
+    avatar: Joi.string()
+      .required()
+      .custom((value, helpers) => {
+        if (validator.isURL(value)) {
+          return value;
+        }
+        return helpers.error(400, 'Введите корректную ссылку в поле avatar');
+      }),
   }),
 }), auth, updateAvatar);
 
