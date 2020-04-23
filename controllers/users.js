@@ -39,13 +39,8 @@ const getUsers = (req, res, next) => {
 
 const getUserById = (req, res, next) => {
   User.findById(req.params.userId)
-    .then((data) => {
-      if
-      (data === null) {
-        throw new NotFoundError('Пользователь не найден');
-      }
-      res.status(200).send({ data });
-    })
+    .orFail(() => new NotFoundError('Пользователь не найден'))
+    .then((data) => res.status(200).send({ data }))
     .catch(next);
 };
 
@@ -54,26 +49,23 @@ const createUser = (req, res, next) => {
   const {
     name, about, avatar, email,
   } = req.body;
-  User.find({ email })
-    .then((data) => {
-      if (data.length !== 0) {
-        return res.status(400).send({ message: 'Email уже зарегистрирован' });
+  bcrypt.hash(req.body.password, 10)
+    .then((hash) => User.create({
+      name, about, avatar, email, password: hash,
+    }))
+    .then((user) => res.status(201).send({
+      name: user.name,
+      about: user.about,
+      email: user.email,
+      avatar: user.avatar,
+    }))
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        res.status(400).send({ message: err.message });
+      } else {
+        next();
       }
-      if (req.body.password === undefined) {
-        res.status(400).send({ message: 'Пароль для регистрации не введен' });
-      }
-      return bcrypt.hash(req.body.password, 10)
-        .then((hash) => User.create({
-          name, about, avatar, email, password: hash,
-        }))
-        .then((user) => res.status(201).send({
-          name: user.name,
-          about: user.about,
-          email: user.email,
-          avatar: user.avatar,
-        }));
-    })
-    .catch(next);
+    });
 };
 
 const updateUserData = (req, res, next) => {
@@ -82,11 +74,8 @@ const updateUserData = (req, res, next) => {
     new: true,
     runValidators: true,
   })
+    .orFail(() => new NotFoundError('Пользователь не найден'))
     .then((user) => {
-      if
-      (user === null) {
-        throw new NotFoundError('Пользователь не найден');
-      }
       if (!user._id.equals(req.user._id)) {
         throw new Forbidden('Нет прав для изменения данных пользователя');
       }
