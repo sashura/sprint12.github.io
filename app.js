@@ -5,6 +5,7 @@ const helmet = require('helmet');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
+const validator = require('validator');
 const { celebrate, Joi, errors } = require('celebrate');
 
 
@@ -48,7 +49,14 @@ app.post('/signup', celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30),
     about: Joi.string().required().min(2),
-    avatar: Joi.string().required().uri(),
+    avatar: Joi.string()
+      .required()
+      .custom((value, helpers) => {
+        if (validator.isURL(value)) {
+          return value;
+        }
+        return helpers.message('Ссылка неккоректна');
+      }),
     email: Joi.string().required().email(),
     password: Joi.string().required().min(5),
   }),
