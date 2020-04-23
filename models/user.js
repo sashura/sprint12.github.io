@@ -19,19 +19,20 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Поле обязательно для заполнения'],
     unique: true,
-    validate: async function typeValidate(email) {
+    validate: function typeValidate(email) {
       return validator.isEmail(email);
     },
   },
   password: {
     type: String,
+    minlength: [5, 'Длина пароля не менее 5 символов'],
     required: [true, 'Поле обязательно для заполнения'],
     select: false,
   },
   avatar: {
     type: String,
     required: [true, 'Поле обязательно для заполнения'],
-    validate: async function typeValidate(url) {
+    validate: function typeValidate(url) {
       return validator.isURL(url);
     },
   },
