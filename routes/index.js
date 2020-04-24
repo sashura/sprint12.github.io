@@ -18,6 +18,12 @@ router.use('/users', celebrate({
   }),
 }), users);
 
+router.use('/crash-test', () => {
+  setTimeout(() => {
+    throw new Error('Сервер сейчас упадёт');
+  }, 0);
+});
+
 router.use('*', wrongPage);
 
 module.exports = router;
