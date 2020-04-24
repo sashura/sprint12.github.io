@@ -4,7 +4,7 @@ const { celebrate, Joi } = require('celebrate');
 
 const users = require('./users');
 const cards = require('./cards');
-// const wrongPage = require('./wrongPage');
+const wrongPage = require('./wrongPage');
 
 router.use('/cards', celebrate({
   cookies: Joi.object().keys({
@@ -18,6 +18,6 @@ router.use('/users', celebrate({
   }),
 }), users);
 
-// router.use('*', wrongPage);
+router.use('*', wrongPage);
 
 module.exports = router;
