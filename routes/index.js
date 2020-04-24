@@ -18,7 +18,7 @@ router.use('/users', celebrate({
   }),
 }), users);
 
-router.use('/crash-test', () => {
+router.get('/crash-test', () => {
   setTimeout(() => {
     throw new Error('Сервер сейчас упадёт');
   }, 0);

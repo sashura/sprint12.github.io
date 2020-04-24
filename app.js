@@ -32,7 +32,6 @@ app.use(bodyParser.json());
 
 app.use(requestLogger);
 
-
 app.post('/signin', celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
