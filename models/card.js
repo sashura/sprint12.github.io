@@ -11,7 +11,7 @@ const cardSchema = new mongoose.Schema({
   link: {
     type: String,
     required: [true, 'Поле обязательно для заполнения'],
-    validate: async function typeValidate(url) {
+    validate: function typeValidate(url) {
       return validator.isURL(url);
     },
   },

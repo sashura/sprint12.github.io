@@ -1,6 +1,9 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
+const NotFoundError = require('../errors/not-found-error');
+const Forbidden = require('../errors/forbidden');
+
 const { NODE_ENV, JWT_SECRET } = process.env;
 const User = require('../models/user');
 
@@ -17,7 +20,7 @@ const login = (req, res) => {
       res.cookie('jwt', token, {
         maxAge: 3600000 * 24 * 7,
         httpOnly: true,
-        samSite: 'lax',
+        sameSite: 'lax',
       });
     })
     .then(() => res.status(200).send({ message: 'Авторизация прошла успешно ' }))
@@ -28,38 +31,24 @@ const login = (req, res) => {
     });
 };
 
-const getUsers = (req, res) => {
+const getUsers = (req, res, next) => {
   User.find({})
     .then((user) => res.send({ data: user }))
-    .catch((err) => res.status(500).send(({ message: err.message })));
+    .catch(next);
 };
 
-const getUserById = (req, res) => {
+const getUserById = (req, res, next) => {
   User.findById(req.params.userId)
-    .then((data) => {
-      if
-      (data === null) {
-        res.status(404).json({ message: 'Пользователь не найден' });
-      }
-      res.status(200).send({ data });
-    })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        res.status(400).json({ message: 'Используйте валидный id' });
-      } else {
-        res.status(500).send(({ message: err.message }));
-      }
-    });
+    .orFail(() => new NotFoundError('Пользователь не найден'))
+    .then((data) => res.status(200).send({ data }))
+    .catch(next);
 };
 
 
-const createUser = (req, res) => {
+const createUser = (req, res, next) => {
   const {
     name, about, avatar, email,
   } = req.body;
-  if (req.body.password === undefined) {
-    res.status(400).send({ message: 'Пароль для регистрации не введен' });
-  }
   bcrypt.hash(req.body.password, 10)
     .then((hash) => User.create({
       name, about, avatar, email, password: hash,
@@ -74,49 +63,40 @@ const createUser = (req, res) => {
       if (err.name === 'ValidationError') {
         res.status(400).send({ message: err.message });
       } else {
-        res.status(500).send({ message: err.message });
+        next();
       }
     });
 };
 
-const updateUserData = (req, res) => {
+const updateUserData = (req, res, next) => {
   const { name, about } = req.body;
-  User.findByIdAndUpdate(req.user._id, { name, about }, { runValidators: true })
+  User.findByIdAndUpdate(req.user._id, { name, about }, {
+    new: true,
+    runValidators: true,
+  })
+    .orFail(() => new NotFoundError('Пользователь не найден'))
     .then((user) => {
-      if
-      (user === null) {
-        res.status(404).json({ message: 'Пользователь не найден' });
-      }
       if (!user._id.equals(req.user._id)) {
-        res.status(403).json({ message: 'Нет прав для изменения данных пользователя' });
+        throw new Forbidden('Нет прав для изменения данных пользователя');
       }
-      res.status(200).send({ user });
+      res.status(200).send(user);
     })
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(400).send({ message: err.message });
-      } else {
-        res.status(500).send({ message: err.message });
-      }
-    });
+    .catch(next);
 };
 
-const updateAvatar = (req, res) => {
+const updateAvatar = (req, res, next) => {
   const { avatar } = req.body;
-  User.findByIdAndUpdate(req.user._id, { avatar }, { runValidators: true })
+  User.findByIdAndUpdate(req.user._id, { avatar }, {
+    new: true,
+    runValidators: true,
+  })
     .then((data) => {
       if (data._id !== req.user._id) {
-        res.status(403).json({ message: 'Нет прав для изменения данных пользователя' });
+        throw new Forbidden('Нет прав для изменения данных пользователя');
       }
       res.send(data);
     })
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(400).send({ message: err.message });
-      } else {
-        res.status(500).send({ message: err.message });
-      }
-    });
+    .catch(next);
 };
 
 module.exports = {
